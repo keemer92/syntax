@@ -1,25 +1,25 @@
-apiVersion: v1
+apiVersion: app/v1
 kind: ReplicaSet
 metadata:
-  name: The name of the replica controller #myapp-rc
-  label:
+  name: The name of the replica set #myapp-rs
+  labels:
     app: categorizing/grouping #ex: myapp
     type: more categorizing/grouping #ex: front-end
 spec:
   template:
     metadata:
       name: The name of the pod #myapp-pod
-      label:
+      labels:
         app: categorizing/grouping #ex: myapp
         type: more categorizing/grouping #ex: front-end
     spec:
-      container:
-        - name: the name of the container #ex: nginx-container
-          image: the name of the image #ex: nginx
+      containers:
+      - name: the name of the container #ex: nginx-container
+        image: the name of the image #ex: nginx
   replicas: the number of replicas
   seclector:
     matchLabels:
-      type: should match the pod specification type #ex: front-end
+      type: should match the pod template type #ex: front-end
 
 replica set commands:
 kubectl create -f ReplicaSetFile.yml: command to create a replica set
