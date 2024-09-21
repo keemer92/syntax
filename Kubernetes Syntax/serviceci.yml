@@ -17,3 +17,4 @@ service commands:
 kubectl create -f service.yml: creates a service
 kubectl apply -f service.yml: creates and updates a service
 kubestl get services: shows a list of the services
+kubectl describe serive: gets detailed info about the service
