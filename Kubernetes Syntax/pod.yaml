@@ -2,13 +2,13 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: The name of the pod #myapp-pod
-  label:
+  labels:
     app: categorizing/grouping #ex: myapp
     type: more categorizing/grouping #ex: front-end
 spec:
   container:
-    - name: the name of the container #ex: nginx-container
-      image: the name of the image #ex: nginx
+  - name: the name of the container #ex: nginx-container
+    image: the name of the image #ex: nginx
 
 
 Commands:
