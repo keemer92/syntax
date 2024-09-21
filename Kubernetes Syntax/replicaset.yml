@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: The name of the replica controller #myapp-rc
+  label:
+    app: categorizing/grouping #ex: myapp
+    type: more categorizing/grouping #ex: front-end
+spec:
+  template:
+    metadata:
+      name: The name of the pod #myapp-pod
+      label:
+        app: categorizing/grouping #ex: myapp
+        type: more categorizing/grouping #ex: front-end
+    spec:
+      container:
+        - name: the name of the container #ex: nginx-container
+          image: the name of the image #ex: nginx
+  replicas: the number of replicas
+  seclector:
+    matchLabels:
+      type: should match the pod specification type #ex: front-end
+
+replica set commands:
+kubectl create -f ReplicaSetFile.yml: command to create a replica set
+kubectl get replicaset: Command to see the list of replica sets
+kubectl delete replicaset <ReplicaSetName>: command to delete a replica set
+kubectl scale replicaset <ReplicaSetName> --replicas=<desiredNumber>: command to scale the replica set
+kubectl scale - -replicas=# -f ReplicaSetFile.yml: Another way to scale
+kubectl describe replicaset <ReplicaSetName>: Command to get more detailed info in a replica set
+kubectl edit replicaset <ReplicaSetName>: Command to edit the name of the replicaset
+kubectl explain replicaset: Command to display the documentation of the replicaset
+kubectl replace -f replicaset.yml: It updates the configuration of an existing resource without needing to delete and recreate it.
