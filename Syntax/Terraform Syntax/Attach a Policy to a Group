@@ -1,6 +1,0 @@
-# Attach the Policy to the Group
-resource "aws_iam_policy_attachment" "example" {
-  name       = "example-attachment"
-  policy_arn = aws_iam_policy.example.arn
-  groups     = [aws_iam_group.example.name]
-}
