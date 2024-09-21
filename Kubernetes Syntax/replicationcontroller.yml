@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: The name of the replica controller #myapp-rc
+  labels:
+    app: categorizing/grouping #ex: myapp
+    type: more categorizing/grouping #ex: front-end
+spec:
+  template:
+    metadata:
+      name: The name of the pod #myapp-pod
+      labels:
+        app: categorizing/grouping #ex: myapp
+        type: more categorizing/grouping #ex: front-end
+    spec:
+      containers:
+      - name: the name of the container #ex: nginx-container
+        image: the name of the image #ex: nginx
+  replicas: the number of replicas
