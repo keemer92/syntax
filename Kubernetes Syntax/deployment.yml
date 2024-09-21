@@ -30,4 +30,11 @@ kubectl apply -f deployment.yml: creates or updates a deployment
 kubectl run <DeploymentName> --image=<IMAGENAME>: creates a deployment with an image name
 kubectl get deployment: gets a list of the deployments
 kubectl get all: shows a list of the deployments, replicaset and pods
+kubectl rollout status deployment/<DEPLOYMENTNAME>: gives the status of the rollout
+kubectl rollout history deployment/<DEPLOYMENTNAME>: gives the history of the rollout
+kubectl set image deployment/<DEPLOYMENTNAME> <CONTAINERNAME>=<IMAGE>:VERSION: updates the image and changes the configuration
+kubectl undo deployment/<DEPLOYMENTNAME>: Command to undo the deployment
+kubectl describe deployment <DeploymentName>: Command to get details of a deployment
+
+
 
