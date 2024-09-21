@@ -1,5 +1,5 @@
 apiVersion: v1
-kind: ReplicationController
+kind: ReplicaSet
 metadata:
   name: The name of the replica controller #myapp-rc
   label:
@@ -26,7 +26,7 @@ kubectl create -f ReplicaSetFile.yml: command to create a replica set
 kubectl get replicaset: Command to see the list of replica sets
 kubectl delete replicaset <ReplicaSetName>: command to delete a replica set
 kubectl scale replicaset <ReplicaSetName> --replicas=<desiredNumber>: command to scale the replica set
-kubectl scale - -replicas=# -f ReplicaSetFile.yml: Another way to scale
+kubectl scale --replicas=# -f ReplicaSetFile.yml: Another way to scale
 kubectl describe replicaset <ReplicaSetName>: Command to get more detailed info in a replica set
 kubectl edit replicaset <ReplicaSetName>: Command to edit the name of the replicaset
 kubectl explain replicaset: Command to display the documentation of the replicaset
