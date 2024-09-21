@@ -1,21 +1,33 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment 
 metadata:
-  name: nginx-deployment
+  name: The name of the deployment #ex: myapp-deployment
   labels:
-    app: nginx
-spec:
+    app: categorizing/grouping #ex: myapp
+    type: more categorizing/grouping #ex: front-end
+spec: 
+  template:
+    metadata:
+      name: The name of the pod #myapp-pod
+      labels:
+        app: categorizing/grouping #ex: myapp
+        type: more categorizing/grouping #ex: front-end
+    spec:
+      containers:
+      - name: the name of the container #ex: nginx-container
+        image: the name of the image #ex: nginx
+        ports:
+        - containerPort: 80
   replicas: How many pods do you want
   selector:
     matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
+      app: 
+      type: The same as the pod template #ex: front-end
+
+Deployment commands:
+kubectl create -f deployment.yml: creates a deployment
+kubectl apply -f deployment.yml: creates or updates a deployment
+kubectl run <DeploymentName> --image=<IMAGENAME>: creates a deployment with an image name
+kubectl get deployment: gets a list of the deployments
+kubectl get all: shows a list of the deployments, replicaset and pods
+
