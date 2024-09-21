@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: The name of the service #ex: myapp-service
+spec:
+  type: LoadBalancer
+  ports:
+  - targetPorts: if not given this will match port #ex: 80
+    port: this is mandatry #ex: 80
+    nodePort: must be between 30000 and 32767
+
+service commands:
+kubectl create -f service.yml: creates a service
+kubectl apply -f service.yml: creates and updates a service
+kubestl get services: shows a list of the services
