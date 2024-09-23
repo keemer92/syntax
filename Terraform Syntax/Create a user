@@ -1,0 +1,4 @@
+#Creates a User
+resource "aws_iam_user" "Unique terraform name" {
+  name = "Unique AWS Name"
+}
