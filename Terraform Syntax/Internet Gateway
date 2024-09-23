@@ -1,5 +1,6 @@
-resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.main.id
+#creates an internet gateway
+resource "aws_internet_gateway" "Unique Terraform Name" {
+  vpc_id = VPCResource.Names.id
 
   tags = {
     Name = "main"
