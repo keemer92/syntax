@@ -1,3 +1,4 @@
+# Creates and s3 bucket
 resource "aws_s3_bucket" "Unique Terraform Name" {
   bucket = "Globally Unique name"  # Replace with a unique bucket name
 
