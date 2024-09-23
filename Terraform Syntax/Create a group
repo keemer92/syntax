@@ -1,0 +1,4 @@
+#Creates a group
+resource "aws_iam_group" "Unique terraform name" {
+  name = "Unique AWS Name"
+}
