@@ -1,0 +1,40 @@
+# Create a Security Group
+resource "aws_security_group" "my_security_group" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  ingress {
+    from_port   = 22  # Allow SSH access
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Change to a more restricted CIDR for security
+  }
+
+  ingress {
+    from_port   = 80  # Allow HTTP access
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "MySecurityGroup"
+  }
+}
+
+
+
+
+Ports to know
+22=ssh (secure shell) log into a linux instance
+21 =ftp. File transfer protocol- upload files into a file share
+22 SFTP (Secure File Transfer Protocol) upload files using SSH
+80 = http- access unsecured websites
+443=HTTPS- access secured websites
+3389=RDP (Remote Desktop Protocol) log into a windows instance
