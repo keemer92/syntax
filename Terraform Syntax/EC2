@@ -1,12 +1,10 @@
-# Define an EC2 Instance
-resource "aws_instance" "example" {
-  ami           = "ami-0c55b159cbfafe1f0"  # Replace with a valid AMI ID
-  instance_type = "t2.micro"                # Replace with your desired instance type
-  key_name      = "my-key-pair"             # Replace with your key pair name
-  subnet_id     = aws_subnet.example.id
-  security_groups = [aws_security_group.example.name]
+# Create an EC2 instance
+resource "aws_instance" "Unique terraform anme" {
+  ami           = "ami-0c55b159cbfafe01e"  # Get this from AWS
+  instance_type = "t2.micro"               # General, Compute, Storage, Memory
+  key_name      = "your-key-pair"          # SSH/Communation/Key-based-access
 
   tags = {
-    Name = "example-instance"
+    Name = "MyEC2Instance"
   }
 }
