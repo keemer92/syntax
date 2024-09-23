@@ -1,6 +1,6 @@
 # Attach the Policy to the Group
-resource "aws_iam_policy_attachment" "example" {
-  name       = "example-attachment"
-  policy_arn = aws_iam_policy.example.arn
+resource "aws_iam_policy_attachment" "Unique Terraform Name" {
+  name       = "Unique AWS Name"
+  policy_arn = Resource.Names.ARN
   groups     = [aws_iam_group.example.name]
 }
