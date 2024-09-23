@@ -38,3 +38,24 @@ Ports to know
 80 = http- access unsecured websites
 443=HTTPS- access secured websites
 3389=RDP (Remote Desktop Protocol) log into a windows instance
+
+Port 22:
+
+Protocol: TCP
+Uses: SSH (Secure Shell) for secure remote login to Linux instances; SFTP (SSH File Transfer Protocol) for secure file transfers.
+Port 21:
+
+Protocol: TCP
+Uses: FTP (File Transfer Protocol) for uploading and downloading files.
+Port 80:
+
+Protocol: TCP
+Uses: HTTP (Hypertext Transfer Protocol) for accessing unsecured websites.
+Port 443:
+
+Protocol: TCP
+Uses: HTTPS (HTTP Secure) for accessing secured websites over SSL/TLS.
+Port 3389:
+
+Protocol: TCP
+Uses: RDP (Remote Desktop Protocol) for logging into Windows instances.
