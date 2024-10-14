@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "Terraform name" {
 }
 
 #Creating a policy for the S3 bucket to define who has access to the bucket
-resource "aws_s3_bucket_policy" "website" #Terraformname {
+resource "aws_s3_bucket_policy" "website" {#Terraformname 
   bucket = aws_s3_bucket.website.id #Awsresource.terraformname.id
 
   policy = jsonencode({
@@ -41,7 +41,7 @@ resource "aws_s3_bucket_policy" "website" #Terraformname {
 }
 
 #create an SSL/TLS certificate
-resource "aws_acm_certificate" "cert" #Terraformname {
+resource "aws_acm_certificate" "cert"{ #Terraformname 
   domain_name = "your-custom-domain.com"  # Replace with your domain name
   validation_method = "DNS" #tell AWS how you want to proves that you own the domainName
   #Options are "DNS" which means you validate ownership by adding a specific DNS, "Email" sends validation email to specific addresses associated with the domain
@@ -51,7 +51,7 @@ resource "aws_acm_certificate" "cert" #Terraformname {
 }
 
 #Creates a DNS record
-resource "aws_route53_record" "cert_validation" # Terraformname{
+resource "aws_route53_record" "cert_validation" {# Terraformname
   zone_id = aws_route53_zone.my_hosted_zone.zone_id  # Reference the created hosted zone
   name     = aws_acm_certificate.cert.domain_validation_options[0].name #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
   type     = aws_acm_certificate.cert.domain_validation_options[0].type #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
@@ -59,8 +59,8 @@ resource "aws_route53_record" "cert_validation" # Terraformname{
   records  = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value] #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
 }
 
-resource "aws_acm_certificate_validation" "cert_validation" {
-  certificate_arn = aws_acm_certificate.cert.arn
+resource "aws_acm_certificate_validation" "cert_validation" { # confirms you own the domain for which you're requesting an SSL/TLS certificate
+  certificate_arn = aws_acm_certificate.cert.arn #aws_acm_certificate.TheNameOfTheCert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
@@ -106,18 +106,18 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 }
 
-resource "aws_route53_record" "www" {
+resource "aws_route53_record" "www" { #points the sub domain to the domain name
   zone_id = "your_route53_zone_id"  # Replace with your Route 53 zone ID
   name     = "www.your-custom-domain.com"  # Replace with your www subdomain
-  type     = "CNAME"
+  type     = "CNAME" #URL to URL
   ttl      = 300
   records  = [aws_cloudfront_distribution.cdn.domain_name]
 }
 
-resource "aws_route53_record" "apex" {
+resource "aws_route53_record" "apex" { #points the main url to the IP address
   zone_id = "your_route53_zone_id"  # Replace with your Route 53 zone ID
   name     = "your-custom-domain.com"  # Replace with your apex domain
-  type     = "A"
+  type     = "A" #URL to IP Address
   alias {
     name                   = aws_cloudfront_distribution.cdn.domain_name
     zone_id                = aws_cloudfront_distribution.cdn.hosted_zone_id
