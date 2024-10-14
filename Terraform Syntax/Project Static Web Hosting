@@ -1,0 +1,128 @@
+#the provider
+provider "aws" {
+  region = "us-east-1"  # ACM certificates for CloudFront must be in us-east-1
+}
+
+# Create a Route 53 hosted zone so the domain can be accessible from the internet
+resource "aws_route53_zone" "my_hosted_zone" {
+  name    = "your-custom-domain.com"  # Replace with your domain name
+  comment = "Hosted zone for my custom domain"
+}
+
+#Creating an S3bucket
+resource "aws_s3_bucket" "Terraform name" {
+  bucket = "s3 bucket name aka your-custom-domain.com"  # Replace with your domain name
+  acl    = "public-read" #option are "private": no other AWS accounts have access, "public-read": Anyone can view, "public-read-write": Anyone can view and modify, "authenticated-read":Users wuth AWS accounts can read, "bucket-owner-read": bucket owner as read access to all objects in the bucket, "bucket-owner-full-control": Bucket owner has full control over all objects in bucket, "log-delivery-write": grants permission for AWS S3 to write to the buckey
+
+  website {
+    index_document = "index.html" #This specifies the default document to serve when a user accesses the root of the website. Placed in the dockerfile
+    error_document = "error.html" #This defines the document to serve when a user requests a page that doesn’t exist (404 error). Place in the dockerfile
+  }
+}
+
+#Creating a policy for the S3 bucket to define who has access to the bucket
+resource "aws_s3_bucket_policy" "website" #Terraformname {
+  bucket = aws_s3_bucket.website.id #Awsresource.terraformname.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow" #This means the policy will allow the specified actions.
+        Principal = "*"  #This specifies who the policy applies to. The asterisk (*) means it applies to everyone
+        Action = "s3:GetObject" #PutObject upload and object, GetObject retrieves an object, DeleteObject deletes an object, ListBucket lists the object, CreateBucket creates a new bucket
+        #DeleteBucket deletes a bucket, PutBucketPolicy add or modify the bucket policy, GetBucketPolicy retrieves the existing bucket policy, PutBucketAcl Sets ACL for the bucket
+        #GetBucketAcl retrieves ACL for the bucket, PutObjectAcl sets ACL for individual objects, GetBucketAcl retreives ACL for individual buckets, PutBucketLogging enables or modify logging,
+        #GetBucketLogging retrieves the logging config
+        Resource = "${aws_s3_bucket.website.arn}/*" #Defines which resource in the bucket is being specified. aws_s3_bucket.websiteAkaTheObjectInTheS3Bucket.arn
+      },
+    ]
+  })
+}
+
+#create an SSL/TLS certificate
+resource "aws_acm_certificate" "cert" #Terraformname {
+  domain_name = "your-custom-domain.com"  # Replace with your domain name
+  validation_method = "DNS" #tell AWS how you want to proves that you own the domainName
+  #Options are "DNS" which means you validate ownership by adding a specific DNS, "Email" sends validation email to specific addresses associated with the domain
+  tags = {
+    Name = "MyCertificate"
+  }
+}
+
+#Creates a DNS record
+resource "aws_route53_record" "cert_validation" # Terraformname{
+  zone_id = aws_route53_zone.my_hosted_zone.zone_id  # Reference the created hosted zone
+  name     = aws_acm_certificate.cert.domain_validation_options[0].name #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
+  type     = aws_acm_certificate.cert.domain_validation_options[0].type #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
+  ttl      = 60 # which is the duration (in seconds) that the record can be cached by DNS resolvers
+  records  = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value] #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
+}
+
+resource "aws_acm_certificate_validation" "cert_validation" {
+  certificate_arn = aws_acm_certificate.cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
+
+resource "aws_cloudfront_distribution" "cdn" {
+  origin {
+    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
+    origin_id   = "S3Origin"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.oid.cloudfront_access_identity_path
+    }
+  }
+
+  enabled             = true
+  default_root_object = "index.html"
+
+  default_cache_behavior {
+    target_origin_id = "S3Origin"
+
+    viewer_protocol_policy = "redirect-to-https"
+
+    allowed_methods = ["GET", "HEAD"]
+
+    cached_methods = ["GET", "HEAD"]
+
+    forward_cookies = "none"
+    forward_query_string = false
+  }
+
+  viewer_certificate {
+    acm_certificate_arn = aws_acm_certificate_validation.cert_validation.certificate_arn
+    ssl_support_method  = "sni-only"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  tags = {
+    Name = "MyCDN"
+  }
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = "your_route53_zone_id"  # Replace with your Route 53 zone ID
+  name     = "www.your-custom-domain.com"  # Replace with your www subdomain
+  type     = "CNAME"
+  ttl      = 300
+  records  = [aws_cloudfront_distribution.cdn.domain_name]
+}
+
+resource "aws_route53_record" "apex" {
+  zone_id = "your_route53_zone_id"  # Replace with your Route 53 zone ID
+  name     = "your-custom-domain.com"  # Replace with your apex domain
+  type     = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.cdn.domain_name
+    zone_id                = aws_cloudfront_distribution.cdn.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+
