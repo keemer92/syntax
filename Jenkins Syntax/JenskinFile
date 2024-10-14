@@ -14,11 +14,11 @@ pipeline {
                 script {
                     // Run SonarQube analysis to make sure the developers code is good to go
                     sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=my-project-key \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://your-sonarqube-server \
-                        -Dsonar.login=your-sonarqube-token
+                        sonar-scanner \ # Starts the command to execute the SonarQube scanner
+                        -Dsonar.projectKey=my-project-key \ # Specifies the SonarQube project key
+                        -Dsonar.sources=. \ #
+                        -Dsonar.host.url=http://your-sonarqube-server \ #Points to the SonarQube server
+                        -Dsonar.login=your-sonarqube-token # authentication token
                     '''
                 }
             }
