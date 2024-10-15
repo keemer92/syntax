@@ -1,4 +1,4 @@
-#the provider
+#the provider would typically go in the provider.tf file
 provider "aws" {
   region = "us-east-1"  # ACM certificates for CloudFront must be in us-east-1
 }
@@ -40,8 +40,8 @@ resource "aws_s3_bucket_policy" "website" {#Terraformname
   })
 }
 
-#create an SSL/TLS certificate
-resource "aws_acm_certificate" "cert"{ #Terraformname 
+#create an SSL/TLS certificate. used for securing communications over the internet. essential for establishing trust and securing data in AWS environments. 
+resource "aws_acm_certificate" "ssl_certificate"{ #Terraformname 
   domain_name = "your-custom-domain.com"  # Replace with your domain name
   validation_method = "DNS" #tell AWS how you want to proves that you own the domainName
   #Options are "DNS" which means you validate ownership by adding a specific DNS, "Email" sends validation email to specific addresses associated with the domain
@@ -50,32 +50,32 @@ resource "aws_acm_certificate" "cert"{ #Terraformname
   }
 }
 
-#Creates a DNS record
-resource "aws_route53_record" "cert_validation" {# Terraformname
+#Creates a DNS record. Tells you how to route traffic throuhgout the internet. AWS can verify that you control the domain.
+resource "aws_route53_record" "cert_validation_record" {# Terraformname
   zone_id = aws_route53_zone.my_hosted_zone.zone_id  # Reference the created hosted zone
-  name     = aws_acm_certificate.cert.domain_validation_options[0].name #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
-  type     = aws_acm_certificate.cert.domain_validation_options[0].type #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
+  name     = aws_acm_certificate.cert.domain_validation_options[0].name #aws_acm_certificate.cert refers to the cert manager Terraform name. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
+  type     = aws_acm_certificate.cert.domain_validation_options[0].type #aws_acm_certificate.cert refers to the cert manager Terraform name. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
   ttl      = 60 # which is the duration (in seconds) that the record can be cached by DNS resolvers
   records  = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value] #aws_acm_certificate.cert refers to the certificate manager. The domain_validation_options list is populated when you create a certificate in AWS ACM. can access it via the Terraform resource attributes or through the AWS Management Console.
-}
+}# used to specify the actual DNS record values that AWS Route 53 will create for domain validation.
 
-resource "aws_acm_certificate_validation" "cert_validation" { # confirms you own the domain for which you're requesting an SSL/TLS certificate
-  certificate_arn = aws_acm_certificate.cert.arn #aws_acm_certificate.TheNameOfTheCert.arn
-  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
-}
+resource "aws_acm_certificate_validation" "ssl_certificate_validation" { #  confirms that the certificate can be issued based on that ownership
+  certificate_arn = aws_acm_certificate.ssl_certificate_validation.arn #aws_acm_certificate.TheNameOfTheCert.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation_record : record.fqdn] # cert_validation_record refers back to the Terraform name for the "aws_route53_record" resource
+} #  tells AWS which DNS records to look at to verify that you control the domain.
 
-resource "aws_cloudfront_distribution" "cdn" {
+resource "aws_cloudfront_distribution" "cdn aka terraform name" { # This caches content at data data centers to reduce latency
   origin {
-    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
-    origin_id   = "S3Origin"
+    domain_name = aws_s3_bucket.website.bucket_regional_domain_name #.website is the S3 bucket specific terraform name
+    origin_id   = "S3Origin" #specifc the origin of the cloud front content
 
-    s3_origin_config {
+    s3_origin_config { #for the s3 bucket this should be written exactly like how it is
       origin_access_identity = aws_cloudfront_origin_access_identity.oid.cloudfront_access_identity_path
     }
   }
 
-  enabled             = true
-  default_root_object = "index.html"
+  enabled             = true # Enables the distribution
+  default_root_object = "index.html" # tells CloudFront to show the index.html file whenever someone visits the main page of your site
 
   default_cache_behavior {
     target_origin_id = "S3Origin"
@@ -110,7 +110,7 @@ resource "aws_route53_record" "www" { #points the sub domain to the domain name
   zone_id = "your_route53_zone_id"  # Replace with your Route 53 zone ID
   name     = "www.your-custom-domain.com"  # Replace with your www subdomain
   type     = "CNAME" #URL to URL
-  ttl      = 300
+  ttl      = 300 # which is the duration (in seconds) that the record can be cached by DNS resolvers
   records  = [aws_cloudfront_distribution.cdn.domain_name]
 }
 
